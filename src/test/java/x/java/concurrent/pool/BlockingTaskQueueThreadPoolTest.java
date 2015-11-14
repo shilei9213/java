@@ -1,8 +1,10 @@
-package x.java.concurrent.queue;
+package x.java.concurrent.pool;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
+
+import x.java.concurrent.pool.BlockingTaskQueueThreadPool;
 
 public class BlockingTaskQueueThreadPoolTest extends TestCase {
 
