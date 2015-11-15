@@ -1,12 +1,6 @@
 package x.java.net.socket.bio;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -17,13 +11,10 @@ import java.net.Socket;
  * @author shilei
  * 
  */
-public class CurrentSocketServer {
-
-	private ServerSocket server;
+public class CurrentSocketServer extends SingleThreadSocketServer{
 
 	public CurrentSocketServer(int port) throws IOException {
-		server = new ServerSocket(port);
-		System.out.println("=========Server start , listen: " + port);
+		super(port);
 	}
 
 	/**
@@ -49,38 +40,7 @@ public class CurrentSocketServer {
 		@Override
 		public void run() {
 			try {
-				System.out.println("=========Accept client connect : ");
-				// 读客户端发送数据流
-				InputStream fromClient = clientSocket.getInputStream();
-				// 回写客户端数据
-				OutputStream toClient = clientSocket.getOutputStream();
-
-				// 包装流
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(fromClient));
-				PrintWriter writer = new PrintWriter(toClient);
-
-				// 读取客户端数据并回写客户端
-				while (true) {
-					String msg = reader.readLine();
-					// 如果msg 为quit 则退出，关闭流程
-					if (msg != null && msg.equalsIgnoreCase("quit")) {
-						break;
-					}
-					System.out.println("=========Recieve Client Message : "
-							+ msg);
-					String respMsg = "Success : " + msg;
-					writer.println(respMsg);
-					writer.flush();
-					System.out.println("=========Server response : " + respMsg);
-				}
-
-				fromClient.close();
-				toClient.close();
-				clientSocket.close();
-
-				System.out.println("=========Server Socket close ! ");
-				System.out.println("===============================");
+				handleClientSocket(clientSocket);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

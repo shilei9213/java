@@ -10,16 +10,20 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import x.java.net.socket.protocal.Protocal;
+
 /**
  * SocketServer 工作： 1）绑定端口 2）接收入站数据
  * 
  * 本类为单线程Socket 服务器,回显，并返回Success：[客户端内容]
  * 
+ * @see Protocal
+ * 
  * @author shilei
  * 
  */
 public class SingleThreadSocketServer {
-	private ServerSocket server;
+	protected ServerSocket server;
 
 	public SingleThreadSocketServer(int port) throws IOException {
 		server = new ServerSocket();
@@ -32,39 +36,50 @@ public class SingleThreadSocketServer {
 	 * 
 	 * @throws IOException
 	 */
-	public void listen() throws IOException {
-		Socket clientSocket = server.accept();
-		System.out.println("=========Accept client connect : ");
+	protected void listen() throws IOException {
+		while (true) {
+			// 获得连接
+			Socket clientSocket = server.accept();
+			handleClientSocket(clientSocket);
+		}
+	}
+
+	protected void handleClientSocket(Socket clientSocket) throws IOException {
+		String clientId = clientSocket.getInetAddress() + ":" + clientSocket.getPort();
+		System.out.println("=========Accept client connect : " + clientId);
+
 		// 读客户端发送数据流
 		InputStream fromClient = clientSocket.getInputStream();
 		// 回写客户端数据
 		OutputStream toClient = clientSocket.getOutputStream();
 
 		// 包装流
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				fromClient));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fromClient));
 		PrintWriter writer = new PrintWriter(toClient);
 
 		// 读取客户端数据并回写客户端
+		/**
+		 * 特别注意，本
+		 */
 		while (true) {
-			String msg = reader.readLine();
-			// 如果msg 为quit 则退出，关闭流程
-			if (msg != null && msg.equalsIgnoreCase("quit")) {
+			// 获取client 信息
+			String clientMsg = Protocal.read(reader);
+			System.out.println("=========Recieve " + clientId + " Message : " + clientMsg);
+
+			// 检测是否关闭
+			if (Protocal.CLOSE.equals(clientMsg)) {
 				break;
 			}
-			System.out.println("=========Recieve Client Message : " + msg);
-			String respMsg = "Success : " + msg;
-			writer.println(respMsg);
-			writer.flush();
-			System.out.println("=========Server response : " + respMsg);
+
+			String respMsg = "Success : " + clientMsg;
+			Protocal.write(writer, respMsg);
+			System.out.println("=========Server response " + clientId + " : " + respMsg);
 		}
-
-		fromClient.close();
-		toClient.close();
 		clientSocket.close();
-		server.close();
+		reader.close();
+		writer.close();
 
-		System.out.println("=========Server close ! ");
+		System.out.println(clientId+" finish ! --------------------------------------------------");
 	}
 
 	public static void main(String[] args) throws Exception {
