@@ -1,21 +1,21 @@
-package x.java.net.socket.protocal;
+package x.java.net.socket.bio;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * 交互协议
+ * 交互协议：一行数据以 ；号结尾标志命令提交结束，发送 quit 命令标志命令终止
  * 
  * @author shilei
  *
  */
 public class Protocal {
 	// 消息包结束，单行
-	public static String END_FLAG = "finish";
+	public static String END_OF_CONTENT = ";";
 
 	// 回话结束
-	public static String CLOSE = "quit";
+	public static String QUIT_CMD = "quit";
 
 	/**
 	 * 写数据
@@ -29,10 +29,11 @@ public class Protocal {
 		String line = null;
 		while (true) {
 			line = reader.readLine();
-			if (END_FLAG.equals(line)) {
+			msg.append(line);
+			if (line.endsWith(END_OF_CONTENT)) {
+				msg.deleteCharAt(msg.length()-1);
 				break;
 			}
-			msg.append(line);
 		}
 		return msg.toString();
 	}
@@ -44,8 +45,8 @@ public class Protocal {
 	 * @param msg
 	 */
 	public static void write(PrintWriter writer, String msg) {
-		writer.println(msg);
-		writer.println(END_FLAG);
+		writer.print(msg);
+		writer.println(END_OF_CONTENT);
 		writer.flush();
 	}
 
@@ -57,9 +58,7 @@ public class Protocal {
 	 * @throws IOException
 	 */
 	public static void close(BufferedReader reader, PrintWriter writer) throws IOException {
-		writer.println(CLOSE);
-		writer.println(END_FLAG);
-		writer.flush();
+		write(writer, QUIT_CMD);
 
 		reader.close();
 		writer.close();

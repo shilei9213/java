@@ -9,8 +9,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import x.java.net.socket.protocal.Protocal;
-
 /**
  * SocketClient 工作： 1）连接远程主机 2）发送数据 3）接受数据 4）关闭连接
  * 

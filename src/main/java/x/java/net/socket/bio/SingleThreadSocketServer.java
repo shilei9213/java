@@ -10,8 +10,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import x.java.net.socket.protocal.Protocal;
-
 /**
  * SocketServer 工作： 1）绑定端口 2）接收入站数据
  * 
