@@ -50,11 +50,6 @@ public class SocketClient {
 		String respMsg = Protocal.read(reader);
 		System.out.println("=========Receiver Server response : " + respMsg);
 
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		Protocal.close(reader, writer);
 		clientSocket.close();
 		System.out.println("=========Client close ! ");

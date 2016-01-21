@@ -26,7 +26,9 @@ public class SingleThreadSocketServer {
 	protected ServerSocket server;
 
 	public SingleThreadSocketServer(int port) throws IOException {
+		// 初始化 server：指定了TCP通讯协议
 		server = new ServerSocket();
+		// 绑定端口 启动
 		server.bind(new InetSocketAddress(port));
 		System.out.println("=========Server start , listen: " + port);
 	}
@@ -38,8 +40,9 @@ public class SingleThreadSocketServer {
 	 */
 	protected void listen() throws IOException {
 		while (true) {
-			// 获得连接
+			// 获得连接socket,此时完成三次握手
 			Socket clientSocket = server.accept();
+			// 处理连接消息
 			handleClientSocket(clientSocket);
 		}
 	}
@@ -67,7 +70,7 @@ public class SingleThreadSocketServer {
 			System.out.println("=========Recieve " + clientId + " Message : " + clientMsg);
 
 			// 检测是否关闭
-			if (Protocal.CLOSE.equals(clientMsg)) {
+			if (Protocal.QUIT_CMD.equals(clientMsg)) {
 				break;
 			}
 
@@ -79,7 +82,7 @@ public class SingleThreadSocketServer {
 		reader.close();
 		writer.close();
 
-		System.out.println(clientId+" finish ! --------------------------------------------------");
+		System.out.println(clientId + " finish ! --------------------------------------------------");
 	}
 
 	public static void main(String[] args) throws Exception {
