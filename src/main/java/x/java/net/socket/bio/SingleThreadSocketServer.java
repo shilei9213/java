@@ -65,7 +65,7 @@ public class SingleThreadSocketServer {
 		while (true) {
 			// 获取client 信息
 			String clientMsg = Protocal.read(reader);
-			System.out.println("=========Recieve " + clientId + " Message : " + clientMsg);
+			System.out.println("Recieve： " + clientId + " Message : " + clientMsg);
 
 			// 检测是否关闭
 			if (Protocal.QUIT_CMD.equals(clientMsg)) {
@@ -74,7 +74,7 @@ public class SingleThreadSocketServer {
 
 			String respMsg = "Success : " + clientMsg;
 			Protocal.write(writer, respMsg);
-			System.out.println("=========Server response " + clientId + " : " + respMsg);
+			System.out.println("Server response： " + clientId + " : " + respMsg);
 		}
 		clientSocket.close();
 		reader.close();
