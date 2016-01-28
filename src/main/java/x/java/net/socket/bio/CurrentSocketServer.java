@@ -8,32 +8,43 @@ import java.net.Socket;
  * 
  * 本类为多线程并发Socket 服务器,回显，并返回Success：[客户端内容]
  * 
+ * 设计模式： 1）acceptor 建立连接 2）n handler 线程进行业务处理
+ * 
+ * 该设计模式缺点： 一个客户端，一个线程，大并发下资源会耗尽
+ * 
  * @author shilei
  * 
  */
-public class CurrentSocketServer extends SingleThreadSocketServer{
+public class CurrentSocketServer extends SingleThreadSocketServer {
 
 	public CurrentSocketServer(int port) throws IOException {
 		super(port);
 	}
 
 	/**
-	 * 处理客户端连接及客户端消息
+	 * 处理客户端连接及客户端消息，相当于Acceptor
 	 * 
 	 * @throws IOException
 	 */
+	@Override
 	public void listen() throws IOException {
 		while (true) {
 			// 监听客户端连接
 			Socket clientSocket = server.accept();
-			new ClientSocketThread(clientSocket).start();
+			new HandlerThread(clientSocket).start();
 		}
 	}
 
-	private class ClientSocketThread extends Thread {
+	/**
+	 * 业务处理线程
+	 * 
+	 * @author shilei
+	 *
+	 */
+	protected class HandlerThread extends Thread {
 		private Socket clientSocket;
 
-		public ClientSocketThread(Socket clientSocket) {
+		public HandlerThread(Socket clientSocket) {
 			this.clientSocket = clientSocket;
 		}
 

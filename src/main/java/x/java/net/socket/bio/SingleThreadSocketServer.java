@@ -15,6 +15,8 @@ import java.net.Socket;
  * 
  * 本类为单线程Socket 服务器,回显，并返回Success：[客户端内容]
  * 
+ * 该模式主要缺点：所有客户端同步，一次只能处理一个连接
+ * 
  * @see Protocal
  * 
  * @author shilei
