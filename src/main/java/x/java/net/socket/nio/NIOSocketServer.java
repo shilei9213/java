@@ -214,6 +214,7 @@ public class NIOSocketServer {
 		// 检测是否关闭
 		if (NIOProtocal.QUIT_CMD.equals(clientMsg)) {
 			clientChannel.close();
+			System.out.println("Close： " + clientId);
 			return;
 		}
 
