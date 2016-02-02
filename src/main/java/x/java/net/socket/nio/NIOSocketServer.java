@@ -9,8 +9,8 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
-import x.java.net.socket.nio.Protocal;
-import x.java.net.socket.nio.Protocal.Message;
+import x.java.net.socket.nio.NIOProtocal;
+import x.java.net.socket.nio.NIOProtocal.Message;
 
 /**
  * nio socket ，
@@ -81,7 +81,8 @@ public class NIOSocketServer {
 		while (true) {
 			try {
 				// 监听Channel上的一批阻塞事件,本方法会阻塞，指导有一批事件到来
-				int keyCount = selector.select(0);
+				// 此处存在NIO select 空轮询现象
+				int keyCount = selector.select();
 
 				if (keyCount == 0) {
 					continue;
@@ -142,6 +143,7 @@ public class NIOSocketServer {
 			String msg = e.getMessage();
 			if (msg != null && msg.indexOf("Connection reset by peer") != -1) {
 				System.out.println("onException: Connection reset by peer");
+				key.cancel();
 				key.channel().close();
 				return;
 			}
@@ -188,7 +190,7 @@ public class NIOSocketServer {
 		String clientId = clientChannel.socket().getInetAddress() + ":" + clientChannel.socket().getPort();
 
 		// 获取上次未读完的消息=======================
-		Message newMessage = Protocal.read(clientChannel);
+		Message newMessage = NIOProtocal.read(clientChannel);
 		Message storeMessage = null;
 		if (key.attachment() != null) {
 			storeMessage = (Message) key.attachment();
@@ -210,13 +212,13 @@ public class NIOSocketServer {
 		System.out.println("Recieve： " + clientId + " Message : " + clientMsg);
 		// 写客户端
 		// 检测是否关闭
-		if (Protocal.QUIT_CMD.equals(clientMsg)) {
+		if (NIOProtocal.QUIT_CMD.equals(clientMsg)) {
 			clientChannel.close();
 			return;
 		}
 
 		String respMsg = "Success : " + clientMsg;
-		Protocal.write(clientChannel, respMsg);
+		NIOProtocal.write(clientChannel, respMsg);
 		System.out.println("Server response： " + clientId + " : " + respMsg);
 	}
 

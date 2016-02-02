@@ -8,7 +8,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
-import x.java.net.socket.nio.Protocal.Message;
+import x.java.net.socket.nio.NIOProtocal.Message;
 
 public class NIOSocketClient {
 	// 客户端通道
@@ -112,7 +112,7 @@ public class NIOSocketClient {
 		clientChannel.configureBlocking(false);
 		// 发送消
 		String reqMsg = "Tom";
-		Protocal.write(clientChannel, reqMsg);
+		NIOProtocal.write(clientChannel, reqMsg);
 		System.out.println("=========Send Server message : " + reqMsg);
 
 		// 注册读事件
@@ -125,10 +125,10 @@ public class NIOSocketClient {
 		SocketChannel clientChannel = (SocketChannel) key.channel();
 
 		// 接收响应
-		Message respMsg = Protocal.read(clientChannel);
+		Message respMsg = NIOProtocal.read(clientChannel);
 		System.out.println("=========Receiver Server response : " + respMsg);
 
-		Protocal.close(clientChannel);
+		NIOProtocal.close(clientChannel);
 		System.out.println("=========Client close ! ");
 	}
 

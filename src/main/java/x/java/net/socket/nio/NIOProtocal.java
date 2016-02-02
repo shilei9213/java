@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
  * @author shilei
  *
  */
-public class Protocal {
+public class NIOProtocal {
 	private static final Charset charset = Charset.forName("UTF-8");// 创建UTF-8字符集
 
 	// 消息包结束，单行
