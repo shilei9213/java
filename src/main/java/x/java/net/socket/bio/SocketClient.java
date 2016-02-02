@@ -41,14 +41,14 @@ public class SocketClient {
 
 		// 发送消
 		String reqMsg = "Tom";
-		Protocal.write(writer, reqMsg);
+		BIOProtocal.write(writer, reqMsg);
 		System.out.println("=========Send Server message : " + reqMsg);
 
 		//接收响应
-		String respMsg = Protocal.read(reader);
+		String respMsg = BIOProtocal.read(reader);
 		System.out.println("=========Receiver Server response : " + respMsg);
 
-		Protocal.close(reader, writer);
+		BIOProtocal.close(reader, writer);
 		clientSocket.close();
 		System.out.println("=========Client close ! ");
 	}

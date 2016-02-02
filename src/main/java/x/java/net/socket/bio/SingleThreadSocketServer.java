@@ -17,7 +17,7 @@ import java.net.Socket;
  * 
  * 该模式主要缺点：所有客户端同步，一次只能处理一个连接
  * 
- * @see Protocal
+ * @see BIOProtocal
  * 
  * @author shilei
  * 
@@ -66,16 +66,16 @@ public class SingleThreadSocketServer {
 		 */
 		while (true) {
 			// 获取client 信息
-			String clientMsg = Protocal.read(reader);
+			String clientMsg = BIOProtocal.read(reader);
 			System.out.println("Recieve： " + clientId + " Message : " + clientMsg);
 
 			// 检测是否关闭
-			if (Protocal.QUIT_CMD.equals(clientMsg)) {
+			if (BIOProtocal.QUIT_CMD.equals(clientMsg)) {
 				break;
 			}
 
 			String respMsg = "Success : " + clientMsg;
-			Protocal.write(writer, respMsg);
+			BIOProtocal.write(writer, respMsg);
 			System.out.println("Server response： " + clientId + " : " + respMsg);
 		}
 		clientSocket.close();

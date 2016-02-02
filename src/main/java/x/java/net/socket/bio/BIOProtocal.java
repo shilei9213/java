@@ -10,7 +10,7 @@ import java.io.PrintWriter;
  * @author shilei
  *
  */
-public class Protocal {
+public class BIOProtocal {
 	// 消息包结束，单行
 	public static String END_OF_CONTENT = ";";
 
