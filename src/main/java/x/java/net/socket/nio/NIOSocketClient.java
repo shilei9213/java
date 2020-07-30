@@ -1,5 +1,6 @@
 package x.java.net.socket.nio;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
@@ -10,14 +11,32 @@ import java.util.Set;
 
 import x.java.net.socket.nio.NIOProtocal.Message;
 
-public class NIOSocketClient {
+/**
+ * 客户端建立连接，写入数据
+ */
+public class NIOSocketClient implements Closeable {
+
+	private boolean runnable = true;
+
 	// 客户端通道
 	private SocketChannel clientChannel = null;
 
 	// 单线程的事件选择器
 	private Selector selector;
 
-	public NIOSocketClient(String serverIp, int port) throws IOException {
+	public static void main(String[] args) throws Exception {
+		try(NIOSocketClient client = new NIOSocketClient("127.0.0.1", 9999)){
+			client.run();
+		}
+	}
+
+
+	NIOSocketClient(String serverIp, int port) throws IOException {
+		InetSocketAddress address = new InetSocketAddress(serverIp, port);
+		connect(address);
+	}
+
+	private void connect(InetSocketAddress address) throws IOException{
 		// 获得一个客户端通道
 		clientChannel = SocketChannel.open();
 		// 设置通道为异步
@@ -25,18 +44,26 @@ public class NIOSocketClient {
 
 		// 创建单线程选择器
 		selector = Selector.open();
-		// 注册连接事件
-		clientChannel.register(selector, SelectionKey.OP_CONNECT);
 
 		// 连接远程服务器
-		clientChannel.connect(new InetSocketAddress(serverIp, port));
+		boolean connect = clientChannel.connect(address);
+		if(connect){
+			// 注册读取事件
+			clientChannel.register(selector, SelectionKey.OP_READ);
+			// 向server 发送数据
+			doWrite();
+		}else{
+			// 注册连接事件
+			clientChannel.register(selector, SelectionKey.OP_CONNECT);
+		}
 	}
 
+
 	private void run() {
-		while (true) {
+		while (runnable) {
 			try {
 				// 监听Channel上的一批阻塞事件,本方法会阻塞，指导有一批事件到来
-				int keyCount = selector.select(0);
+				int keyCount = selector.select(1000);
 
 				if (keyCount == 0) {
 					continue;
@@ -55,13 +82,13 @@ public class NIOSocketClient {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				return;
 			}
 		}
 	}
 
 	private void processKey(SelectionKey key) throws Exception {
 		try {
-
 			if (key.isConnectable()) {
 				// 连接就绪事件，表示客户与服务器的连接已经建立成功
 				System.out.println("=== isConnectable() ： " + key);
@@ -79,9 +106,7 @@ public class NIOSocketClient {
 
 	/**
 	 * 产生异常时触发
-	 * 
-	 * @param e
-	 * @throws IOException
+
 	 */
 	private void onException(SelectionKey key, Throwable cause) throws IOException {
 		if (cause instanceof IOException) {
@@ -97,12 +122,8 @@ public class NIOSocketClient {
 
 	/**
 	 * 通常用于客户端使用，连接成功时触发
-	 * 
-	 * @param key
-	 * @throws IOException
 	 */
 	private void onConnect(SelectionKey key) throws IOException {
-		SocketChannel clientChannel = (SocketChannel) key.channel();
 
 		// 如果正在连接，则完成连接
 		if (clientChannel.isConnectionPending()) {
@@ -110,13 +131,20 @@ public class NIOSocketClient {
 		}
 
 		clientChannel.configureBlocking(false);
+
+
+		// 注册读事件
+		clientChannel.register(selector, SelectionKey.OP_READ);
+
+		// 向服务器发送数据
+		doWrite();
+	}
+
+	private void doWrite() throws IOException{
 		// 发送消
 		String reqMsg = "Tom";
 		NIOProtocal.write(clientChannel, reqMsg);
 		System.out.println("=========Send Server message : " + reqMsg);
-
-		// 注册读事件
-		clientChannel.register(selector, SelectionKey.OP_READ);
 	}
 
 	// 处理数据读取
@@ -132,9 +160,12 @@ public class NIOSocketClient {
 		System.out.println("=========Client close ! ");
 	}
 
-	public static void main(String[] args) throws Exception {
-		NIOSocketClient client = new NIOSocketClient("127.0.0.1", 9999);
-		client.run();
-	}
 
+	@Override
+	public void close() throws IOException {
+		runnable = false;
+		if(clientChannel!=null){
+			clientChannel.close();
+		}
+	}
 }

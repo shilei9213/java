@@ -1,10 +1,12 @@
 package x.java.net.socket.aio;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * AIO client
@@ -12,30 +14,36 @@ import java.nio.channels.CompletionHandler;
  * @author shilei
  *
  */
-public class AIOSocketClient {
-	private static Object lock = new Object();
+public class AIOSocketClient implements Closeable {
+	private CountDownLatch runnable= new CountDownLatch(1);
 
 	private String serverIp;
 	private int port;
+
+
+	public static void main(String[] args) throws Exception {
+		try(AIOSocketClient client = new AIOSocketClient("127.0.0.1", 9999)){
+			client.run();
+		}
+	}
 
 	public AIOSocketClient(String serverIp, int port) {
 		this.serverIp = serverIp;
 		this.port = port;
 	}
 
-	public void run() throws IOException {
+	public void run() throws IOException, InterruptedException {
 		// 创建通道
 		AsynchronousSocketChannel serverChannel = AsynchronousSocketChannel.open();
 		// 建立连接
 		serverChannel.connect(new InetSocketAddress(serverIp, port), serverChannel, new ConnectCompletionHandler());
 
-		synchronized (lock) {
-			try {
-				lock.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		runnable.await();
+	}
+
+	@Override
+	public void close() throws IOException {
+		runnable.countDown();
 	}
 
 	/**
@@ -92,9 +100,7 @@ public class AIOSocketClient {
 					if (isClose) {
 						serverChannel.close();
 						System.out.println("=========Client close ! ");
-						synchronized (lock) {
-							lock.notifyAll();
-						}
+						close();
 						return;
 					}
 					// 继续读取
@@ -142,8 +148,5 @@ public class AIOSocketClient {
 
 	}
 
-	public static void main(String[] args) throws Exception {
-		AIOSocketClient client = new AIOSocketClient("127.0.0.1", 9999);
-		client.run();
-	}
+
 }

@@ -22,10 +22,6 @@ public class NIOProtocal {
 
 	/**
 	 * 写数据
-	 * 
-	 * @param reader
-	 * @return
-	 * @throws IOException
 	 */
 	public static Message read(SocketChannel channel) throws IOException {
 		Message clientMsg = new Message();
