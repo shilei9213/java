@@ -7,7 +7,8 @@ import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.Charset;
 
 /**
- * file：queue.meta 元数据， file: queue.data 保存队列内容
+ * file：queue.meta 元数据，格式 head:int,tail:int
+ * file: queue.data 保存队列内容 length:int , data:byte[]
  */
 public class FileQueue {
     private static final Charset charset = Charset.forName("UTF-8");
