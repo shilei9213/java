@@ -1,4 +1,4 @@
-package x.java.net.socket.nio;
+package x.java.net.tcp.socket.nio;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
-import x.java.net.socket.nio.NIOProtocal.Message;
+import x.java.net.tcp.socket.nio.NIOProtocal.Message;
 
 /**
  * 客户端建立连接，写入数据

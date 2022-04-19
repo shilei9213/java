@@ -1,4 +1,4 @@
-package x.java.net.socket.nio;
+package x.java.net.tcp.socket.nio;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

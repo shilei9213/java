@@ -1,4 +1,4 @@
-package x.java.net.socket.aio;
+package x.java.net.tcp.socket.aio;
 
 import java.io.Closeable;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package x.java.net.socket.bio;
+package x.java.net.tcp.socket.bio;
 
 import java.io.IOException;
 import java.net.Socket;

@@ -1,4 +1,4 @@
-package x.java.net.socket.aio;
+package x.java.net.tcp.socket.aio;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -9,8 +9,8 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.CountDownLatch;
 
-import x.java.net.socket.aio.AIOProtocal.Message;
-import x.java.net.socket.nio.NIOProtocal;
+import x.java.net.tcp.socket.aio.AIOProtocal.Message;
+import x.java.net.tcp.socket.nio.NIOProtocal;
 
 /**
  * aio socket server
