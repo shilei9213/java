@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 
 /**
  * SocketServer 工作： acceptor模式
@@ -26,9 +27,6 @@ import java.net.Socket;
 public class MainThreadSocketServer implements Closeable {
 
     static final int DEFAULT_PORT = 9999;
-
-    // 启动标志
-    private boolean runnable = true;
 
     // server实例
     protected ServerSocket server;
@@ -50,7 +48,7 @@ public class MainThreadSocketServer implements Closeable {
      * 处理客户端连接及客户端消息
      */
     void listen() throws IOException {
-        while (runnable) {
+        while (true) {
             // 建立连接，完成三次握手，返回socket
             Socket clientSocket = server.accept();
             // 处理连接消息
@@ -109,8 +107,8 @@ public class MainThreadSocketServer implements Closeable {
 
     @Override
     public void close() throws IOException {
-        runnable = false;
-        server.close();
-
+        if (Objects.nonNull(server)) {
+            server.close();
+        }
     }
 }
